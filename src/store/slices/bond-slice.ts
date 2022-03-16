@@ -10,7 +10,7 @@ import { Bond } from "../../helpers/bond/bond";
 import { Networks } from "../../constants/blockchain";
 import { getBondCalculator } from "../../helpers/bond-calculator";
 import { RootState } from "../store";
-import { avaxTime, wavax } from "../../helpers/bond";
+import { avaxKandy, wavax } from "../../helpers/bond";
 import { error, warning, success, info } from "../slices/messages-slice";
 import { messages } from "../../constants/messages";
 import { getGasPrice } from "../../helpers/get-gas-price";
@@ -93,6 +93,7 @@ export interface IBondDetails {
 }
 
 export const calcBondDetails = createAsyncThunk("bonding/calcBondDetails", async ({ bond, value, provider, networkID }: ICalcBondDetails, { dispatch }) => {
+    console.log("calcBondDetails");
     if (!value) {
         value = "0";
     }
@@ -110,17 +111,16 @@ export const calcBondDetails = createAsyncThunk("bonding/calcBondDetails", async
     const bondCalcContract = getBondCalculator(networkID, provider);
 
     const terms = await bondContract.terms();
+
     const maxBondPrice = (await bondContract.maxPayout()) / Math.pow(10, 9);
-
     let marketPrice = await getMarketPrice(networkID, provider);
-
     const mimPrice = getTokenPrice("MIM");
     marketPrice = (marketPrice / Math.pow(10, 9)) * mimPrice;
 
     try {
         bondPrice = await bondContract.bondPriceInUSD();
 
-        if (bond.name === avaxTime.name) {
+        if (bond.name === avaxKandy.name) {
             const avaxPrice = getTokenPrice("AVAX");
             bondPrice = bondPrice * avaxPrice;
         }
@@ -164,7 +164,7 @@ export const calcBondDetails = createAsyncThunk("bonding/calcBondDetails", async
         purchased = await bondCalcContract.valuation(assetAddress, purchased);
         purchased = (markdown / Math.pow(10, 18)) * (purchased / Math.pow(10, 9));
 
-        if (bond.name === avaxTime.name) {
+        if (bond.name === avaxKandy.name) {
             const avaxPrice = getTokenPrice("AVAX");
             purchased = purchased * avaxPrice;
         }

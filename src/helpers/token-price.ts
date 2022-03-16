@@ -11,5 +11,9 @@ export const loadTokenPrices = async () => {
 };
 
 export const getTokenPrice = (symbol: string): number => {
-    return Number(cache[symbol]);
+    if(Object.keys(cache).length > 0) {
+        return Number(cache[symbol]);
+    } 
+    return 1;
+    
 };
